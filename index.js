@@ -5,6 +5,7 @@ function startWebSocketServer() {
   const path = require('path')
   const ws = require('websocket-stream')
   const pipe = require('multipipe')
+  const noop = () => {}
   const port = process.env.PORT || 1337
   const verifyRequest = (req, res) => {
     if (req.upgrade) return
