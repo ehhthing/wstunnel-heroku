@@ -15,10 +15,9 @@ function startWebSocketServer() {
   const httpServer = http.createServer(verifyRequest)
   const wsServer = ws.createServer({
     server: httpServer
-  }, function(remote) {
-    const req = remote.socket.upgradeReq
+  }, function(remote, request) {
     const requestType = "TCP"
-    console.log(remote.socket)
+    console.log(request)
     if (requestType == "TCP") {
       const target = net.createConnection(1080, "127.0.0.1")
       target.on('connect', () => {
