@@ -5,6 +5,7 @@ function startWebSocketServer() {
   const path = require('path')
   const ws = require('websocket-stream')
   const pipe = require('multipipe')
+  const dgram = require('dgram')
   const noop = () => {}
   const port = process.env.PORT || 1337
   const verifyRequest = (req, res) => {
@@ -16,23 +17,30 @@ function startWebSocketServer() {
   const wsServer = ws.createServer({
     server: httpServer
   }, function(remote, request) {
-    const requestType = "TCP"
-    console.log(request)
+    const requestType = request.url.replace("/", "")
+    console.log(requestType)
     if (requestType == "TCP") {
       const target = net.createConnection(1080, "127.0.0.1")
       target.on('connect', () => {
         pipe(remote, target, noop)
         pipe(target, remote, noop)
       })
-    } else if (requestType == "UDP") {
-
-    } else {
-      remote.terminate()
     }
   })
   httpServer.listen(port, (err) => {
     if (err) showError(err)
     else console.info('Server is listening on ' + port)
+  })
+  wsServer.on("connection", function(wsocket) {
+    if (wsocket.url.replace("/", "") == "UDP") {
+      var udp = dgram.createSocket("udp4")
+      ws.on('message', function(message) {
+        udp.send(message, 0, message.length, "127.0.0.1", port)
+      })
+      udp.on('message', function(msg) {
+        wsocket.send(msg)
+      })
+    }
   })
 }
 
