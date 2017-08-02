@@ -9,19 +9,27 @@ function startWebSocketServer() {
   const port = process.env.PORT || 1337
   const verifyRequest = (req, res) => {
     if (req.upgrade) return
-    res.statusCode = 405
-    res.end('connect via WebSocket protocol')
+    res.statusCode = 404
+    res.end('Not found')
   }
   const httpServer = http.createServer(verifyRequest)
   const wsServer = ws.createServer({
     server: httpServer
   }, function(remote) {
     const req = remote.socket.upgradeReq
-    const target = net.createConnection(1080, "127.0.0.1")
-    target.on('connect', () => {
-      pipe(remote, target, noop)
-      pipe(target, remote, noop)
-    })
+    const requestType = "TCP"
+    console.log(remote.socket)
+    if (requestType == "TCP") {
+      const target = net.createConnection(1080, "127.0.0.1")
+      target.on('connect', () => {
+        pipe(remote, target, noop)
+        pipe(target, remote, noop)
+      })
+    } else if (requestType == "UDP") {
+
+    } else {
+      remote.terminate()
+    }
   })
   httpServer.listen(port, (err) => {
     if (err) showError(err)
