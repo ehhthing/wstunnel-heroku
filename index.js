@@ -31,8 +31,8 @@ function startWebSocketServer() {
     else console.info('Server is listening on ' + port)
   })
   wsServer.on("connection", function(wsocket) {
-    const requestType = request.url.replace("/", "") || "TCP"
-    if (requestType == "UDP") {
+    const requestType = wsocket.url.replace("/", "") || "TCP"
+    if (requestType== "UDP") {
       var udp = dgram.createSocket("udp4")
       ws.on('message', function(message) {
         udp.send(message, 0, message.length, "127.0.0.1", port)
