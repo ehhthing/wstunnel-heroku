@@ -7,7 +7,7 @@ function startWebSocketServer() {
   const pipe = require('multipipe')
   const dgram = require('dgram')
   const noop = () => {}
-  const port = process.env.PORT || 1337
+  const port = process.env.PORT || 80
   const verifyRequest = (req, res) => {
     if (req.upgrade) return
     res.statusCode = 404
